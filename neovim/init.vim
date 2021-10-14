@@ -74,15 +74,11 @@ set noea
 
 let s:plugins_dir = stdpath('data') . '/site/pack/amgg/start'
 if !isdirectory(s:plugins_dir)
-	echo 'making plugins dir at "' . s:plugins_dir . '"'
 	call mkdir(s:plugins_dir, 'p')
 endif
 
 let s:plugin_postinits = []
 function! s:plugin_postinit()
-	if len(s:plugin_postinits) > 0
-		echo 'plugin install post'
-	endif
 	for cmd in s:plugin_postinits
 		execute cmd
 	endfor
@@ -102,7 +98,6 @@ function! Plugin(slug, type, identifier, options)
 		return
 	endif
 	" install
-	echo 'installing plugin ' . a:identifier
 	if a:type == 'git'
 		if executable('git') != 1
 			throw 'git not found or not supported, can''t install plugin'
@@ -115,7 +110,7 @@ function! Plugin(slug, type, identifier, options)
 			let l:gitcmd .= ' --depth=1'
 		endif
 		let l:gitcmd .= ' ' . shellescape(a:identifier) . ' ' . shellescape(s:plugins_dir . '/' . a:slug)
-		echo system(l:gitcmd)
+		call system(l:gitcmd)
 	else
 		throw 'unknown plugin type "' . a:type . '"'
 	endif
@@ -133,9 +128,6 @@ autocmd VimEnter * call s:plugin_postinit()
 
 call Plugin('treesitter', 'github', 'nvim-treesitter/nvim-treesitter', {'post': ':TSUpdate'})
 call Plugin('lspconfig', 'github', 'neovim/nvim-lspconfig', {})
-
-
-
 
 
 " .------------------.
@@ -165,3 +157,4 @@ require'lspconfig'.clangd.setup{
 	cmd = { "clangd", "--query-driver=/opt/rh/devtoolset-8/root/usr/bin/g++" }
 }
 EOF
+
