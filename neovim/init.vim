@@ -165,34 +165,3 @@ require'lspconfig'.clangd.setup{
 	cmd = { "clangd", "--query-driver=/opt/rh/devtoolset-8/root/usr/bin/g++" }
 }
 EOF
-
-" .-------.
-" | TODOs |
-" `-------`
-
-" TODO 'move selected lines up and down' from vim8rc
-
-" TODO is disabling bell necessary in nvim?
-
-" TODO font stuff, has(gui_running) stuff from vim8rc
-
-" TODO plugins from vim8rc
-
-" TODO local vimrc settings from vim8rc if use that plugin
-
-" TODO coc.nvim stuff from vim8rc if use that
-
-" TODO show_documentation function from vim8rc
-
-" TODO OverCommandLine
-
-
-
-
-
-
-
-
-
-
-
