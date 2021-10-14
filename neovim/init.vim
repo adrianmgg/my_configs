@@ -107,14 +107,14 @@ function! Plugin(slug, type, identifier, options)
 		if executable('git') != 1
 			throw 'git not found or not supported, can''t install plugin'
 		endif
-		let l:gitcmd = 'git -C ' . shellescape(s:plugins_dir) . ' clone'
+		let l:gitcmd = 'git clone'
 		if has_key(a:options, 'branch')
 			let l:gitcmd .= ' --branch '. shellescape(get(a:options, 'branch'))
 		endif
 		if get(a:options, 'shallow', 1)
 			let l:gitcmd .= ' --depth=1'
 		endif
-		let l:gitcmd .= ' ' . shellescape(a:identifier) . ' ' . shellescape(a:slug)
+		let l:gitcmd .= ' ' . shellescape(a:identifier) . ' ' . shellescape(s:plugins_dir . '/' . a:slug)
 		echo system(l:gitcmd)
 	else
 		throw 'unknown plugin type "' . a:type . '"'
