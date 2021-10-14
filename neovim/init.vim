@@ -68,6 +68,9 @@ set sessionoptions=blank,buffers,folds,help,resize,sesdir,tabpages,winpos,winsiz
 " don't normalize window sizes when splitting/closing splits
 set noea
 
+" 
+set clipboard=unnamed
+
 " .---------.
 " | plugins |
 " `---------`
@@ -84,9 +87,9 @@ function! s:plugin_postinit()
 	endfor
 endfunction
 
-" Plugin('slug', 'git', 'url of repository', {[shallow: 0|1], [branch: 'branch'], [common options]}
+" Plugin('slug', 'git', 'url of repository', {shallow?: 0|1, branch?: 'branch', ...common options}
 " Plugin('slug', 'github', 'user/repo', { same as for 'git' }
-" common options - {[post: ':command']}
+" common options - {post?: ':command'|[commands]}
 function! Plugin(slug, type, identifier, options)
 	" 'github' -> 'git' helper
 	if a:type == 'github'
@@ -116,17 +119,23 @@ function! Plugin(slug, type, identifier, options)
 	endif
 	" 
 	if has_key(a:options, 'post')
+		let l:post = get(a:options, 'post')
+		if type(l:post) != v:t_list
+			let l:post = [l:post]
+		endif
 		if v:vim_did_enter
-			execute get(a:options, 'post')
+			for p in l:post
+				execute p
+			endfor
 		else
-			let s:plugin_postinits += [get(a:options, 'post')]
+			let s:plugin_postinits += l:post
 		endif
 	endif
 endfunction
 
 autocmd VimEnter * call s:plugin_postinit()
 
-call Plugin('treesitter', 'github', 'nvim-treesitter/nvim-treesitter', {'post': ':TSUpdate'})
+call Plugin('treesitter', 'github', 'nvim-treesitter/nvim-treesitter', {'post': ':TSUpdateSync'})
 call Plugin('lspconfig', 'github', 'neovim/nvim-lspconfig', {})
 
 
