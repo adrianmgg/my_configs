@@ -75,69 +75,118 @@ set clipboard=unnamed
 " | plugins |
 " `---------`
 
-let s:plugins_dir = stdpath('data') . '/site/pack/amgg/start'
+let s:plugins_dir = stdpath('data') . '/site/pack/amgg/opt'
 if !isdirectory(s:plugins_dir)
 	call mkdir(s:plugins_dir, 'p')
 endif
 
+let s:plugin_postinstalls = []
 let s:plugin_postinits = []
 function! s:plugin_postinit()
+	for cmd in s:plugin_postinstalls
+		execute cmd
+	endfor
 	for cmd in s:plugin_postinits
 		execute cmd
 	endfor
 endfunction
 
+" remove all plugins which are in plugin directory but weren't added via
+" Plugin() this session
+function! PluginCleanup()
+	" TODO
+endfunction
+
 " Plugin('slug', 'git', 'url of repository', {shallow?: 0|1, branch?: 'branch', ...common options}
 " Plugin('slug', 'github', 'user/repo', { same as for 'git' }
-" common options - {post?: ':command'|[commands]}
+" common options - {
+"   postinit?: ':command'|[commands],
+"   postinstall?: 'command'|[commands],
+"   disable?: bool,
+"   loadat?: 'now'|'init'|'never' = 'init'
+" }
 function! Plugin(slug, type, identifier, options)
 	" 'github' -> 'git' helper
 	if a:type == 'github'
 		call Plugin(a:slug, 'git', 'git@github.com:' . a:identifier . '.git', a:options)
 		return
 	endif
-	" do nothing if already installed
-	if isdirectory(s:plugins_dir . '/' . a:slug)
-		return
+	" 
+	let l:did_install = v:false
+	" options defaults/normalizing
+	let l:disabled = get(a:options, 'disable', v:false)
+	let l:loadat = get(a:options, 'loadat', 'init')
+	if l:loadat != 'init' && l:loadat != 'now' && l:loadat != 'never'
+		throw 'invalid loadat value "' . l:loadat . '"'
 	endif
-	" install
-	if a:type == 'git'
-		if executable('git') != 1
-			throw 'git not found or not supported, can''t install plugin'
+	let l:postinit = get(a:options, 'postinit', [])
+	if type(l:postinit) != v:t_list
+		let l:postinit = [l:postinit]
+	endif
+	let l:postinstall = get(a:options, 'postinstall', [])
+	if type(l:postinstall) != v:t_list
+		let l:postinstall = [l:postinstall]
+	endif
+	" if enabled and not installed yet, install it
+	if !(isdirectory(s:plugins_dir . '/' . a:slug) || l:disabled)
+		let l:did_install = v:true
+		if a:type == 'git'
+			if executable('git') != 1
+				throw 'git not found or not supported, can''t install plugin'
+			endif
+			let l:gitcmd = 'git clone'
+			if has_key(a:options, 'branch')
+				let l:gitcmd .= ' --branch '. shellescape(get(a:options, 'branch'))
+			endif
+			if get(a:options, 'shallow', 1)
+				let l:gitcmd .= ' --depth=1'
+			endif
+			let l:gitcmd .= ' ' . shellescape(a:identifier) . ' ' . shellescape(s:plugins_dir . '/' . a:slug)
+			call system(l:gitcmd)
+		else
+			throw 'unknown plugin type "' . a:type . '"'
 		endif
-		let l:gitcmd = 'git clone'
-		if has_key(a:options, 'branch')
-			let l:gitcmd .= ' --branch '. shellescape(get(a:options, 'branch'))
-		endif
-		if get(a:options, 'shallow', 1)
-			let l:gitcmd .= ' --depth=1'
-		endif
-		let l:gitcmd .= ' ' . shellescape(a:identifier) . ' ' . shellescape(s:plugins_dir . '/' . a:slug)
-		call system(l:gitcmd)
-	else
-		throw 'unknown plugin type "' . a:type . '"'
 	endif
 	" 
-	if has_key(a:options, 'post')
-		let l:post = get(a:options, 'post')
-		if type(l:post) != v:t_list
-			let l:post = [l:post]
+	if !l:disabled
+		" when the optional ! is added no plugin files or ftdetect scripts are
+		" loaded, only the matching directories are added to 'runtimepath'.
+		" this is useful in your .vimrc. the plugins will then be loaded
+		" during initialization (:help packadd)
+		if v:vim_did_enter || l:loadat == 'now'
+			execute 'packadd ' . a:slug
+		elseif l:loadat == 'init'
+			execute 'packadd! ' . a:slug
 		endif
-		if v:vim_did_enter
-			for p in l:post
+		" TODO "Note that for ftdetect scripts to be loaded you will need to
+		" write 'filetype plugin indent on' AFTER all packadd! commands"
+	endif
+	" run (or set up for later) post-install commands
+	if l:did_install
+		if v:vim_did_enter || (l:loadat == 'now')
+			for p in l:postinstall
 				execute p
 			endfor
-		else
-			let s:plugin_postinits += l:post
+		elseif l:loadat == 'init'
+			let s:plugin_postinstalls += l:postinstall
 		endif
 	endif
+	" run (or set up for later) post-init commands
+	if v:vim_did_enter || (l:loadat == 'now')
+		for p in l:postinit
+			execute p
+		endfor
+	elseif l:loadat == 'init'
+		let s:plugin_postinits += l:postinit
+	endif
+	" TODO any good way to do post for loadat='never'? (ie can be manually
+	" loaded with packadd)
 endfunction
 
-autocmd VimEnter * call s:plugin_postinit()
+autocmd VimEnter * ++once call s:plugin_postinit()
 
-call Plugin('treesitter', 'github', 'nvim-treesitter/nvim-treesitter', {'post': ':TSUpdateSync'})
-call Plugin('lspconfig', 'github', 'neovim/nvim-lspconfig', {})
-
+call Plugin('treesitter', 'github', 'nvim-treesitter/nvim-treesitter', {'postinstall': ':TSUpdateSync', 'loadat': 'now'})
+call Plugin('lspconfig', 'github', 'neovim/nvim-lspconfig', {'loadat': 'now'})
 
 " .------------------.
 " | treesitter stuff |
@@ -161,9 +210,19 @@ EOF
 " | language server stuff |
 " `-----------------------`
 
+" TODO move this to local configs instead - maybe with a helper function?
 lua <<EOF
 require'lspconfig'.clangd.setup{
 	cmd = { "clangd", "--query-driver=/opt/rh/devtoolset-8/root/usr/bin/g++" }
+}
+require'lspconfig'.pyright.setup{
+	settings = {
+		python = {
+			analysis = {
+				typeCheckingMode = 'basic', -- basic, strict
+			}
+		}
+	}
 }
 EOF
 
