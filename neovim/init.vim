@@ -52,11 +52,19 @@ set showtabline=2
 " enable line numbers by default
 set number
 
+" toggle relative line numbers with \ n
+noremap <leader>n :set relativenumber!<CR>
+
 " set signcolumn=yes
 
 " .------.
 " | misc |
 " `------`
+
+" use forward slashes even on windows
+if exists('+shellslash')
+	set shellslash
+endif
 
 " use mouse
 set mouse=a
@@ -70,6 +78,8 @@ set noea
 
 " 
 set clipboard=unnamed
+
+command! CopyBuffer %y+
 
 " .---------.
 " | plugins |
@@ -134,15 +144,18 @@ function! Plugin(slug, type, identifier, options)
 			if executable('git') != 1
 				throw 'git not found or not supported, can''t install plugin'
 			endif
-			let l:gitcmd = 'git clone'
+			let l:gitcmd = ['git', 'clone']
 			if has_key(a:options, 'branch')
-				let l:gitcmd .= ' --branch '. shellescape(get(a:options, 'branch'))
+				let l:gitcmd += ['--branch', get(a:options, 'branch']
 			endif
 			if get(a:options, 'shallow', 1)
-				let l:gitcmd .= ' --depth=1'
+				let l:gitcmd += ['--depth=1']
 			endif
-			let l:gitcmd .= ' ' . shellescape(a:identifier) . ' ' . shellescape(s:plugins_dir . '/' . a:slug)
-			call system(l:gitcmd)
+			let l:gitcmd += [a:identifier, s:plugins_dir . '/' . a:slug]
+			let l:gitoutput = system(l:gitcmd)
+			if v:shell_error != 0
+				throw "error in git call\n" . string(l:gitcmd) . "\n" . l:gitoutput
+			endif
 		else
 			throw 'unknown plugin type "' . a:type . '"'
 		endif
@@ -187,6 +200,9 @@ autocmd VimEnter * ++once call s:plugin_postinit()
 
 call Plugin('treesitter', 'github', 'nvim-treesitter/nvim-treesitter', {'postinstall': ':TSUpdateSync', 'loadat': 'now'})
 call Plugin('lspconfig', 'github', 'neovim/nvim-lspconfig', {'loadat': 'now'})
+call Plugin('bbye', 'github', 'moll/vim-bbye', {})
+call Plugin('fzf', 'github', 'junegunn/fzf', {'postinstall': 'call fzf#install()'})
+call Plugin('fzf-vim', 'github', 'junegunn/fzf.vim', {})
 
 " .------------------.
 " | treesitter stuff |
@@ -205,6 +221,16 @@ require'nvim-treesitter.configs'.setup {
 	}
 }
 EOF
+
+" folding
+set foldlevelstart=99
+set foldcolumn=auto:9
+augroup TreesitterFold
+	autocmd!
+	" TODO these are window-local not buffer-local, should do a BufEnter
+	" autocmd as well for this
+	autocmd FileType vim setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()
+augroup end
 
 " .-----------------------.
 " | language server stuff |
@@ -226,3 +252,27 @@ require'lspconfig'.pyright.setup{
 }
 EOF
 
+" .-------------.
+" | netrw stuff |
+" `-------------`
+
+let g:netrw_preview = 1      " preview in vertical split
+let g:netrw_winsize = 30     " initial size (%) of netrw relative to created splits (from preview/open)
+let g:netrw_liststyle = 3    " tree style listing
+let g:netrw_browse_split = 4 " when browsing, <cr> will act like "P"
+let g:netrw_keepdir = 1      " current dir != browsing dir
+let g:netrw_banner = 0       " hide banner
+let g:netrw_bufsettings = 'nomodifiable nomodified nowrap readonly nobuflisted number norelativenumber'
+                           \ " same as netrw's default, but with number on
+
+" open netrw at pwd on startup if no files to edit specified
+augroup NetrwOnStartup
+	autocmd!
+	autocmd VimEnter * ++once if expand('%') == '' && argc() == 0 | :Lexplore . | wincmd p | endif
+augroup END
+
+" .------------.
+" | bbye stuff |
+" `------------`
+
+nnoremap <Leader>q :Bdelete<CR>
