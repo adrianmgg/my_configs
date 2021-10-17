@@ -79,6 +79,7 @@ set noea
 " 
 set clipboard=unnamed
 
+"
 command! CopyBuffer %y+
 
 " .---------.
@@ -137,6 +138,10 @@ function! Plugin(slug, type, identifier, options)
 	if type(l:postinstall) != v:t_list
 		let l:postinstall = [l:postinstall]
 	endif
+	" do nothing if plugin disabled
+	if l:disabled
+		return
+	endif
 	" if enabled and not installed yet, install it
 	if !(isdirectory(s:plugins_dir . '/' . a:slug) || l:disabled)
 		let l:did_install = v:true
@@ -166,7 +171,7 @@ function! Plugin(slug, type, identifier, options)
 		" loaded, only the matching directories are added to 'runtimepath'.
 		" this is useful in your .vimrc. the plugins will then be loaded
 		" during initialization (:help packadd)
-		if v:vim_did_enter || l:loadat == 'now'
+		if (l:loadat == 'init' && v:vim_did_enter) || l:loadat == 'now'
 			execute 'packadd ' . a:slug
 		elseif l:loadat == 'init'
 			execute 'packadd! ' . a:slug
@@ -176,7 +181,7 @@ function! Plugin(slug, type, identifier, options)
 	endif
 	" run (or set up for later) post-install commands
 	if l:did_install
-		if v:vim_did_enter || (l:loadat == 'now')
+		if (l:loadat == 'init' && v:vim_did_enter) || (l:loadat == 'now')
 			for p in l:postinstall
 				execute p
 			endfor
@@ -185,7 +190,7 @@ function! Plugin(slug, type, identifier, options)
 		endif
 	endif
 	" run (or set up for later) post-init commands
-	if v:vim_did_enter || (l:loadat == 'now')
+	if (l:loadat == 'init' && v:vim_did_enter) || (l:loadat == 'now')
 		for p in l:postinit
 			execute p
 		endfor
@@ -200,9 +205,12 @@ autocmd VimEnter * ++once call s:plugin_postinit()
 
 call Plugin('treesitter', 'github', 'nvim-treesitter/nvim-treesitter', {'postinstall': ':TSUpdateSync', 'loadat': 'now'})
 call Plugin('lspconfig', 'github', 'neovim/nvim-lspconfig', {'loadat': 'now'})
+call Plugin('airline', 'github', 'vim-airline/vim-airline', {'loadat': 'never'})
 call Plugin('bbye', 'github', 'moll/vim-bbye', {})
 call Plugin('fzf', 'github', 'junegunn/fzf', {'postinstall': 'call fzf#install()'})
 call Plugin('fzf-vim', 'github', 'junegunn/fzf.vim', {})
+call Plugin('plenary', 'github', 'nvim-lua/plenary.nvim', {}) " for gitsigns
+call Plugin('gitsigns', 'github', 'lewis6991/gitsigns.nvim', {'postinit': 'lua require(''gitsigns'').setup()'})
 
 " .------------------.
 " | treesitter stuff |
@@ -265,14 +273,64 @@ let g:netrw_banner = 0       " hide banner
 let g:netrw_bufsettings = 'nomodifiable nomodified nowrap readonly nobuflisted number norelativenumber'
                            \ " same as netrw's default, but with number on
 
-" open netrw at pwd on startup if no files to edit specified
-augroup NetrwOnStartup
-	autocmd!
-	autocmd VimEnter * ++once if expand('%') == '' && argc() == 0 | :Lexplore . | wincmd p | endif
-augroup END
+" " open netrw at pwd on startup if no files to edit specified
+" augroup NetrwOnStartup
+" 	autocmd!
+" 	autocmd VimEnter * ++once if expand('%') == '' && argc() == 0 | :Lexplore . | wincmd p | endif
+" augroup END
 
 " .------------.
 " | bbye stuff |
 " `------------`
 
 nnoremap <Leader>q :Bdelete<CR>
+
+" .-------------.
+" | shell stuff |
+" `-------------`
+
+if has('win32')
+	let g:shell = 'pwsh'
+else
+	let g:shell = $SHELL
+endif
+
+function! s:shelltoggle()
+	if exists('t:shell_winid')
+		if win_id2win(t:shell_winid) == 0
+			unlet t:shell_winid
+		endif
+	endif
+	if !exists('t:shell_winid')
+		exec 'split term://' . g:shell
+		let t:shell_winid = win_getid()
+		startinsert
+	else
+		if win_getid() == t:shell_winid
+			" go to previous window
+			call win_gotoid(win_getid(winnr('#')))
+			stopinsert
+		else
+			" go back to shell window
+			call win_gotoid(t:shell_winid)
+			startinsert
+		endif
+	endif
+endfunction
+
+command! Shell call <SID>shelltoggle()
+" switch to terminal from current window
+nnoremap <C-`> :Shell<CR>
+" switch back from terminal to previous window without exiting terminal mode
+tnoremap <C-`> <C-\><C-n>:Shell<CR>
+
+" .------------.
+" | font stuff |
+" `------------`
+
+function! AirlineOn()
+	" GuiFont! scientifica\ vector
+	let g:airline_powerline_fonts = 1
+	packadd airline
+endfunction
+
