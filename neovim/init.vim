@@ -82,6 +82,12 @@ set clipboard=unnamed
 "
 command! CopyBuffer %y+
 
+" don't keep search highlight around after <CR>
+set nohlsearch
+
+" don't unload buffers that aren't currently visible in any window
+set hidden
+
 " .---------.
 " | plugins |
 " `---------`
@@ -323,6 +329,9 @@ command! Shell call <SID>shelltoggle()
 nnoremap <C-`> :Shell<CR>
 " switch back from terminal to previous window without exiting terminal mode
 tnoremap <C-`> <C-\><C-n>:Shell<CR>
+
+" | wmd |
+command! -nargs=* -bang -range=% WMD call mkdir(expand('%:h'), 'p') | <line1>,<line2>w<bang> <args>
 
 " .------------.
 " | font stuff |
