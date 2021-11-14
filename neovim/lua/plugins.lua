@@ -13,7 +13,10 @@ require('packer').startup (function(use)
 	use {
 		'nvim-treesitter/nvim-treesitter',
 		run = ':TSUpdate',
-		requires = { 'nvim-treesitter/nvim-treesitter-textobjects', 'nvim-treesitter/playground' },
+		requires = {
+			-- 'nvim-treesitter/nvim-treesitter-textobjects',
+			'nvim-treesitter/playground'
+		},
 		config = function() require'plugin_configs.treesitter' end
 	}
 	use 'neovim/nvim-lspconfig'
@@ -61,6 +64,10 @@ require('packer').startup (function(use)
 	-- use {
 	-- 	'stsewd/sphinx.nvim',
 	-- 	run = ':UpdateRemotePlugins',
+	-- }
+	-- use {
+	-- 	'chrisbra/DynamicSigns',
+	-- 	config = function() vim.g.Signs_Alternate = 1 end,
 	-- }
 
 	-- do setup stuff if had to install packer

@@ -7,15 +7,15 @@ cmp.setup {
 	},
 	mapping = {
 		['<C-Space>'] = cmp.mapping(cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Replace,
+			behavior = cmp.ConfirmBehavior.Insert,
 			select = true,
 		}), { 'i' }),
 		['<Tab>'] = cmp.mapping(cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Replace,
+			behavior = cmp.ConfirmBehavior.Insert,
 			select = false,
 		}), { 'i' }),
 		['<CR>'] = cmp.mapping(cmp.mapping.confirm({
-			behavior = cmp.ConfirmBehavior.Replace,
+			behavior = cmp.ConfirmBehavior.Insert,
 			select = false,
 		}), { 'i' }),
 	}
