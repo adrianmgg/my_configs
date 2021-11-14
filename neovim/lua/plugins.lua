@@ -7,6 +7,22 @@ if vim.fn.isdirectory(packer_install_path) == 0 then
 	packer_did_bootstrap = vim.v.shell_error ~= 0
 end
 
+require'packer'.init {
+	git = {
+		subcommands = {
+			-- TODO make these machine-specific
+			-- for old git version on uni timeshare (default has '--progress' which isn't supported and causes error)
+			submodules = 'submodule update --init --recursive',
+			diff = 'log --color=never --pretty=format:FMT HEAD@{1}...HEAD', -- (--no-show-signature not supported)
+			get_msg = 'log --color=never --pretty=format:FMT HEAD -n 1',
+			get_header = 'log --color=never --pretty=format:FMT HEAD -n 1',
+			get_bodies = 'log --color=never --pretty=format:"===COMMIT_START===%h%n%s===BODY_START===%b" HEAD@{1}...HEAD',
+			-- (--rebase=false not supported)
+			update = 'pull --ff-only --progress',
+		},
+	},
+}
+
 require('packer').startup (function(use)
 	use 'wbthomason/packer.nvim'
 	-- plugins here --
@@ -75,4 +91,3 @@ require('packer').startup (function(use)
 		require('packer').sync()
 	end
 end)
-
