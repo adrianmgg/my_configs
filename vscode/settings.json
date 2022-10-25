@@ -67,7 +67,8 @@
         "#workbench\\.parts\\.activitybar ul.actions-container > li > a:before": "font-size: 24px !important;",
         "#workbench\\.parts\\.statusbar > .items-container > .statusbar-item > a[role=button] > .codicon:before": "font-size: 14px!important; font-weight: 400!important;",
         ".monaco-workbench .codicon[class*=codicon-]::before": "font-size: 16px!important; font-weight: 400!important;",
-        ".monaco-editor .suggest-preview-text": "font-style: normal;"
+        "/* de-italicize autocomplete preview ghost text */ .monaco-editor .suggest-preview-text": "font-style: normal;",
+        "/* de-italicize autocomplete preview ghost text */ .monaco-editor .ghost-text-decoration": "font-style: normal;",
     },
     "C_Cpp.intelliSenseEngine": "Disabled",
     "files.exclude": {
