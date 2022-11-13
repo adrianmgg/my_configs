@@ -1,0 +1,82 @@
+{
+  "accesskit.preferences.blue_links": false,
+  "accesskit.preferences.boring_tag_chiclets": false,
+  "accesskit.preferences.disable_animations": false,
+  "accesskit.preferences.disable_gifs": false,
+  "accesskit.preferences.no_user_colours": false,
+  "accesskit.preferences.no_user_fonts": false,
+  "accesskit.preferences.visible_alt_text": true,
+  "accesskit.preferences.visible_alt_text_mode": "show",
+  "enabledScripts": [
+    "anti_capitalism",
+    "mirror_posts",
+    "mutual_checker",
+    "quick_reblog",
+    "quick_tags",
+    "timeformat",
+    "themed_posts",
+    "accesskit",
+    "tweaks"
+  ],
+  "hide_avatars.preferences.hiddenAvatars": "",
+  "mutual_checker.preferences.showOnlyMutuals": false,
+  "quick_reblog.alreadyRebloggedList": [
+    "700629995329126400",
+    "696854841581076480",
+    "700381869718601728"
+  ],
+  "quick_reblog.preferences.alreadyRebloggedEnabled": true,
+  "quick_reblog.preferences.alreadyRebloggedLimit": "100",
+  "quick_reblog.preferences.popupPosition": "above",
+  "quick_reblog.preferences.queueTag": "",
+  "quick_reblog.preferences.quickTagsIntegration": true,
+  "quick_reblog.preferences.reblogTag": "",
+  "quick_reblog.preferences.rememberLastBlog": true,
+  "quick_reblog.preferences.showBlogSelector": true,
+  "quick_reblog.preferences.showCommentInput": false,
+  "quick_reblog.preferences.showTagSuggestions": false,
+  "quick_reblog.preferences.showTagsInput": true,
+  "quick_reblog.rememberedBlogs": {
+    "b264b5e9f15015e2c02b56524f5c5592f37ea8b7f1bea4bd979a5fdf2450c0ee": "5e2eb7c3e61e8876b951cc2aab0ff1ed764e707f30fa71f0d98d44d0e739348f"
+  },
+  "quick_tags.preferences.answerTag": "",
+  "quick_tags.preferences.autoTagAsker": false,
+  "quick_tags.preferences.originalPostTag": "",
+  "quick_tags.preferences.tagBundles": [
+    {
+      "tags": "described",
+      "title": "described"
+    },
+    {
+      "tags": "undescribed",
+      "title": "undescribed"
+    }
+  ],
+  "themed_posts.preferences.blacklistedUsernames": "",
+  "themed_posts.preferences.enableOnPeepr": false,
+  "themed_posts.preferences.reblogTrailTheming": true,
+  "timeformat.preferences.displayRelative": true,
+  "timeformat.preferences.format": "YYYY MMM(MM) DD - h:mm A",
+  "timestamps.preferences.alwaysShowYear": false,
+  "timestamps.preferences.headerTimestamps": false,
+  "timestamps.preferences.isoFormat": false,
+  "timestamps.preferences.reblogTimestamps": "op",
+  "tweaks.preferences.caught_up_line": false,
+  "tweaks.preferences.hide_activity_notification_badge": false,
+  "tweaks.preferences.hide_filtered_posts": false,
+  "tweaks.preferences.hide_follower_counts": false,
+  "tweaks.preferences.hide_footer_tooltips": false,
+  "tweaks.preferences.hide_liked_posts": false,
+  "tweaks.preferences.hide_mini_follow": false,
+  "tweaks.preferences.hide_my_posts": false,
+  "tweaks.preferences.highlight_contributed_content": true,
+  "tweaks.preferences.no_focus_shadow": false,
+  "tweaks.preferences.no_where_were_we": false,
+  "tweaks.preferences.show_all_tags": true,
+  "tweaks.preferences.show_full_note_count": true,
+  "tweaks.preferences.slim_filtered_screens": false,
+  "tweaks.preferences.unsticky_post_avatars": false,
+  "tweaks.preferences.unsticky_tab_bar": false,
+  "vanilla_audio.preferences.defaultVolume": "100",
+  "vanilla_video.preferences.defaultVolume": "100"
+}
