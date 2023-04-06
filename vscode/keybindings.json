@@ -17,5 +17,16 @@
     {
         "key": "ctrl+shift+tab",
         "command": "workbench.action.previousEditor"
-    }
+    },
+    {
+        "key": "f12",
+        "command": "editor.action.goToTypeDefinition",
+        "when": "editorLangId == 'python'"
+    },
+    {
+        "key": "f12",
+        "command": "-editor.action.revealDefinition",
+        "when": "editorLangId == 'python'"
+    },
+    { "key": "ctrl+shift+=", "command": "zoombar-vscode.selectZoom", "when": "'wraith13.zoombar-vscode' in workbench.views.extensions.installed" }
 ]
