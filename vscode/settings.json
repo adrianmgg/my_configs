@@ -4,6 +4,7 @@
         "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
     },
     "workbench.colorTheme": "Deepdark Material Theme | Full Black Version",
+    // "editor.fontLigatures": false,
     "terminal.integrated.fontFamily": "Programming Font", "terminal.integrated.fontSize": 11,
     "editor.fontFamily": "Programming Font", "editor.fontSize": 11,
     "todo-tree.tree.showScanModeButton": false,
@@ -75,9 +76,51 @@
         "**/.classpath": true,
         "**/.project": true,
         "**/.settings": true,
-        "**/.factorypath": true
+        "**/.factorypath": true,
+        // show .git, but just /info/exclude
+        "**/.git": false,
+        "**/.git/[^i]*":true,"**/.git/i[^n]*":true,"**/.git/in[^f]*":true,"**/.git/inf[^o]*":true,"**/.git/info/[^e]*":true,"**/.git/info/e[^x]*":true,"**/.git/info/ex[^c]*":true,"**/.git/info/exc[^l]*":true,"**/.git/info/excl[^u]*":true,"**/.git/info/exclu[^d]*":true,"**/.git/info/exclud[^e]*":true,
     },
     "explorer.compactFolders": false,
     "code-eol.highlightNonDefault": true,
     "editor.renderWhitespace": "all",
+    "editor.rulers": [
+        80,
+        100
+    ],
+    // "python.analysis.typeCheckingMode": "basic",
+    "editor.minimap.enabled": false,
+    "svelte.enable-ts-plugin": true,
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "python.linting.mypyEnabled": true,
+    // "python.analysis.typeCheckingMode": "off",
+    "python.linting.lintOnSave": true,
+    "python.linting.mypyArgs": [
+        // vscode defaults
+        // "--follow-imports=silent",
+        // "--ignore-missing-imports",
+        "--show-column-numbers",
+        "--no-pretty",
+        // type checking behavior
+        "--check-untyped-defs",
+        "--warn-unused-ignores",
+        "--warn-return-any",
+    //     // mypy behavior
+    //     "--show-error-context",
+    //     "--soft-error-limit=-1", // "default limit is 200" ... "If N is negative, there is no limit"
+    ],
+    "graphviz-interactive-preview.debouncingInterval": 250,
+    // "␍", "¶", "¬", "␊"
+    // "code-eol.newlineCharacter": "¬",
+    // "code-eol.returnCharacter" : "¤",
+    // "code-eol.crlfCharacter"   : "¤¬",
+    "zoombar.zoomPreset": [
+        144,  // fixedsys
+        100,  // scientifica
+        58,   // tom thumb
+    ],
+    "zoombar.preview": false,
+    "window.zoomLevel": 0
 }
