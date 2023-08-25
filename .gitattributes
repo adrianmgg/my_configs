@@ -3,4 +3,6 @@
 *.vim  text eol=lf
 *.lua  text eol=lf
 
+.gitignore text eol=lf
+
 
