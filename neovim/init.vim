@@ -18,9 +18,9 @@ set showtabline=1
 " show line numbers, numbered relative to current line
 set number relativenumber
 
-" " only show sign column when there are signs to display, auto resize to
-" " accomodate multiple signs up to the max (9)
-" set signcolumn=auto:9
+" only show sign column when there are signs to display, auto resize to
+" accomodate multiple signs up to the max (9)
+set signcolumn=auto:9
 
 " TODO - from old config - mouse, sessionoptions, clipboard, CopyBuffer
 
@@ -60,7 +60,8 @@ augroup END
 " cd %:p:h
 
 " colorscheme amgg
-colorscheme desert
+" colorscheme desert
+colorscheme slate
 
 " highlight cursor line
 set cursorline

@@ -1,7 +1,8 @@
 
-local function telescope_builtin(picker)
+local function telescope_builtin(picker, opts)
+	if opts == nil then opts = {} end
 	return function()
-		require('telescope.builtin')[picker]()
+		require('telescope.builtin')[picker](opts)
 	end
 end
 
@@ -15,7 +16,11 @@ local whichkey_keymaps = {
 				f = { telescope_builtin'find_files', 'local files' },
 				b = { telescope_builtin'buffers', 'buffers' },
 				c = { telescope_builtin'colorscheme', 'color schemes' },
-				g = { telescope_builtin'live_grep', 'grep' },
+				F = { telescope_builtin'live_grep', 'grep in files' },
+				g = { telescope_builtin'git_files', 'git files' },
+				h = { telescope_builtin('find_files', { hidden = true }), 'local files (include hidden)' },
+				-- via https://github.com/nvim-telescope/telescope.nvim/issues/855#issuecomment-1032325327
+				H = { telescope_builtin('live_grep', { additional_args = function(opts) return {'--hidden'} end }), 'grep in files (include hidden)' },
 			},
 		},
 	},
