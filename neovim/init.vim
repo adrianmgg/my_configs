@@ -44,10 +44,7 @@ set hidden
 
 " keep selection on visual mode insert change
 vnoremap > >gv
-exec 'vnoremap < <gv'
-" TODO - the '<' confuses treesitter and fucks up the highlighting for the
-" next line. should probably file a bug report for that
-" ^ TODO old comment. is this still the case?automcd
+vnoremap < <gv
 
 " cwd in title
 set title
