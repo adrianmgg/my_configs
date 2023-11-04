@@ -37,6 +37,7 @@ return {
 		'neovim/nvim-lspconfig',
 		cmd = 'LspInfo',
 		event = {'BufReadPre', 'BufNewFile'},
+		-- TODO - make sure load order will always be as described in https://github.com/williamboman/mason-lspconfig.nvim#setup
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
 			'williamboman/mason-lspconfig.nvim',
