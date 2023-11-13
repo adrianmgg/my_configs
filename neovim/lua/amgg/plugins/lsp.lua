@@ -46,7 +46,31 @@ return {
 		config = function()
 			local lspzero = require'lsp-zero'
 			lspzero.on_attach(function(_, bufnr)
-				lspzero.default_keymaps{buffer = bufnr}
+				-- lspzero.default_keymaps{buffer = bufnr}
+				local which_key = require'which-key'
+				which_key.register({
+					K = { vim.lsp.buf.hover, 'display hover info' },
+					g = {
+						d = { function() require'telescope.builtin'.lsp_definitions() end, 'jump to definition' },
+						D = { vim.lsp.buf.declaration, 'jump to declaration' },
+						i = { vim.lsp.buf.implementation, 'jump to implementation' },
+						o = { vim.lsp.buf.type_definition, 'jump to type definition' },
+						r = { vim.lsp.buf.references, 'list references' },
+						s = { vim.lsp.buf.signature_help, 'show signature info' },
+						l = { vim.diagnostic.open_float(), 'show diagnostics' },
+					},
+					['<leader>fs'] = { function() require'telescope.builtin'.lsp_document_symbols() end, 'symbols (document)' },
+					['<leader>fS'] = { function() require'telescope.builtin'.lsp_workspace_symbols() end, 'symbols (workspace)' },
+					['<F2>'] = { vim.lsp.buf.rename, 'rename' },
+					['<F3>'] = { function() vim.lsp.buf.format{ async = true } end, 'format' },
+					['<F4>'] = { vim.lsp.buf.code_action, 'format' },
+					['[d'] = { vim.diagnostic.goto_prev, 'previous diagnostic' },
+					[']d'] = { vim.diagnostic.goto_next, 'next diagnostic' },
+				}, { mode = 'n', buffer = bufnr })
+				which_key.register({
+					['<F3>'] = { function() vim.lsp.buf.format{ async = true } end, 'format' },
+					['<F4>'] = { vim.lsp.buf.range_code_action or vim.lsp.buf.code_action, 'code action' },
+				}, { mode = 'x', buffer = bufnr })
 			end)
 
 			-- "configure lua language server for neovim"

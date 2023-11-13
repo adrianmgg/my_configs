@@ -4,21 +4,27 @@ return {
 		tag = '0.1.2',
 		dependencies = { 'nvim-lua/plenary.nvim' },
 		cmd = 'Telescope',
-		opts = {
-			pickers = {
-				colorscheme = {
-					enable_preview = true,
-				},
-			},
-		},
 		config = function(lazyplugin, opts)
 			local telescope = require'telescope'
-			telescope.setup(opts)
+			local actions = require'telescope.actions'
+			telescope.setup {
+				pickers = {
+					colorscheme = {
+						enable_preview = true,
+					},
+					buffers = {
+						mappings = {
+							i = {
+								-- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#mapping-c-d-to-delete-buffer
+								['<c-d>'] = actions.delete_buffer + actions.move_to_top,
+							},
+						},
+					},
+				},
+			}
 			telescope.load_extension'nvim_configs'
 		end,
 	},
 }
 
-
--- telescope.load_extension'nvim_configs'
 
