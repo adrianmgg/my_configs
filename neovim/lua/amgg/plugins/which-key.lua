@@ -6,6 +6,14 @@ local function telescope_builtin(picker, opts)
 	end
 end
 
+local function telescope_extension(extension, picker, opts)
+	if picker == nil then picker = extension end
+	if opts == nil then opts = {} end
+	return function ()
+		require'telescope'.extensions[extension][picker](opts)
+	end
+end
+
 local whichkey_keymaps = {
 	{
 		opts = { prefix = '<leader>' },
@@ -21,7 +29,9 @@ local whichkey_keymaps = {
 				h = { telescope_builtin('find_files', { hidden = true }), 'local files (include hidden)' },
 				-- via https://github.com/nvim-telescope/telescope.nvim/issues/855#issuecomment-1032325327
 				H = { telescope_builtin('live_grep', { additional_args = function(opts) return {'--hidden'} end }), 'grep in files (include hidden)' },
-				N = { '<cmd>Telescope nvim_configs<cr>', 'nvim config files' },
+				N = { telescope_extension'nvim_configs', 'nvim config files' },
+				-- TODO should only actually register these if we end up loading telescope-everything
+				E = { telescope_extension('everything', 'everything', {}), 'everything' },
 			},
 		},
 	},

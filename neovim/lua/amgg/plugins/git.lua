@@ -3,6 +3,7 @@ return {
 		'lewis6991/gitsigns.nvim',
 		-- "tag = 'release' -- To use the latest release (do not use this if you run Neovim nightly or dev builds!)"
 		tag = 'release',
+		event = 'VeryLazy',
 		opts = {
 			signs = {
 				add          = { text = '+' },
@@ -16,7 +17,7 @@ return {
 			current_line_blame_opts = {
 				-- TODO should add virt_text_priority, but that was added more recently & still need to try running newer ver than release tag
 				virt_text = true,
-				virt_text_pos = 'right_align',
+				virt_text_pos = 'eol',
 				delay = 0,
 			},
 		},

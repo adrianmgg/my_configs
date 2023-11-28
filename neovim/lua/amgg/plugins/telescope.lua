@@ -23,7 +23,16 @@ return {
 				},
 			}
 			telescope.load_extension'nvim_configs'
+			if vim.fn.executable'es' == 1 then
+				telescope.load_extension'everything'
+			end
 		end,
+	},
+
+	{
+		'Verf/telescope-everything.nvim',
+		dependencies = { 'nvim-telescope/telescope.nvim' },
+		lazy = true,
 	},
 }
 

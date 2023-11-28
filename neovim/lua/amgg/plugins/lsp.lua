@@ -53,11 +53,11 @@ return {
 					g = {
 						d = { function() require'telescope.builtin'.lsp_definitions() end, 'jump to definition' },
 						D = { vim.lsp.buf.declaration, 'jump to declaration' },
-						i = { vim.lsp.buf.implementation, 'jump to implementation' },
+						i = { function() require'telescope.builtin'.lsp_implementations() end, 'jump to implementation' },
 						o = { vim.lsp.buf.type_definition, 'jump to type definition' },
-						r = { vim.lsp.buf.references, 'list references' },
+						r = { function() require'telescope.builtin'.lsp_references() end, 'list references' },
 						s = { vim.lsp.buf.signature_help, 'show signature info' },
-						l = { vim.diagnostic.open_float(), 'show diagnostics' },
+						l = { vim.diagnostic.open_float, 'show diagnostics' },
 					},
 					['<leader>fs'] = { function() require'telescope.builtin'.lsp_document_symbols() end, 'symbols (document)' },
 					['<leader>fS'] = { function() require'telescope.builtin'.lsp_workspace_symbols() end, 'symbols (workspace)' },
@@ -73,8 +73,23 @@ return {
 				}, { mode = 'x', buffer = bufnr })
 			end)
 
+			local lspconfig = require'lspconfig'
+
 			-- "configure lua language server for neovim"
-			require'lspconfig'.lua_ls.setup(lspzero.nvim_lua_ls())
+			lspconfig.lua_ls.setup(lspzero.nvim_lua_ls())
+
+			-- https://github.com/rust-lang/rust-analyzer/blob/master/docs/user/generated_config.adoc
+			lspconfig.rust_analyzer.setup {
+				settings = {
+					['rust-analyzer'] = {
+						checkOnSave = {
+							command = 'clippy',
+						},
+						rustfmt = {
+						},
+					},
+				},
+			}
 
 			lspzero.setup()
 		end,
