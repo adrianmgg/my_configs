@@ -36,7 +36,8 @@ return {
 			{ '<leader>fh', telescope_builtin('find_files', { hidden = true }), desc = 'local files (include hidden)' },
 			-- via https://github.com/nvim-telescope/telescope.nvim/issues/855#issuecomment-1032325327
 			{ '<leader>fH', telescope_builtin('live_grep', { additional_args = function(opts) return {'--hidden'} end }), desc = 'grep in files (include hidden)' },
-			{ '<leader>fN', telescope_extension'nvim_configs', desc = 'nvim config files' },
+			{ '<leader>fn', telescope_builtin('find_files', { prompt_title = 'Nvim Configs', cwd = vim.fn.stdpath('config') }), desc = 'nvim config files' },
+			{ '<leader>fN', telescope_builtin('live_grep', { prompt_title = 'Nvim Configs', cwd = vim.fn.stdpath('config') }), desc = 'grep in nvim config files' },
 			-- TODO should only actually register these if we end up loading telescope-everything
 			{ '<leader>fE', telescope_extension('everything', 'everything', {}), desc = 'everything' },
 

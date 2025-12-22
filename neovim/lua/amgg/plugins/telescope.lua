@@ -1,7 +1,9 @@
 return {
+	-- NOTE: keybinds for telescope are set in `which-key.lua`,
+	--       not in this file.
+	--       that way telescope only has to lazy load once it's actually called.
 	{
 		'nvim-telescope/telescope.nvim',
-		-- tag = '0.1.2',
 		dependencies = { 'nvim-lua/plenary.nvim' },
 		cmd = 'Telescope',
 		config = function(lazyplugin, opts)
