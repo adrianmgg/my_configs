@@ -1,85 +1,106 @@
 return {
-	-- https://github.com/VonHeikemen/lsp-zero.nvim/blob/v2.x/doc/md/guides/lazy-loading-with-lazy-nvim.md
-	{
-		'VonHeikemen/lsp-zero.nvim',
-		branch = 'v2.x',
-		lazy = true,
-		config = function()
-			require'lsp-zero.settings'.preset {
-				name = 'minimal', -- which base preset to use
-				set_lsp_keymaps = false, -- TODO
-				manage_nvim_cmp = {
-					set_sources = 'recommended', -- TODO
-					-- https://github.com/VonHeikemen/lsp-zero.nvim/blob/f084f4a6a716f55bf9c4026e73027bb24a0325a3/lua/lsp-zero/cmp.lua#L209-L232
-					set_basic_mappings = true, -- create keybindings that emulate Neovim's default completion
-					set_extra_mappings = false, -- TODO
-					use_luasnip = true,
-					set_format = true,
-					documentation_window = true,
-				},
-				setup_servers_on_start = true, -- all servers installed with mason.nvim will be initialized on startup
-				call_servers = 'local', -- "use mason.nvim whenever possible"
-				configure_diagnostics = true, -- "adds borders and sorts 'severity' of diagnostics"
-				float_border = 'rounded', -- TODO
-			}
-		end,
-	},
 	{
 		'hrsh7th/nvim-cmp',
 		event = 'InsertEnter', -- TODO - ideally this wouldn't be triggered by pulling up telescope
-		dependencies = { 'L3MON4D3/LuaSnip' },
+		dependencies = {
+			'L3MON4D3/LuaSnip',
+			'hrsh7th/cmp-nvim-lsp',
+		},
 		config = function()
-			require'lsp-zero.cmp'.extend()
+			local cmp = require 'cmp'
+			local function toggle_docs() if cmp.visible_docs() then cmp.close_docs() else cmp.open_docs() end end
+			cmp.setup {
+				sources = {
+					{ name = 'nvim_lsp' },
+				},
+				-- mapping = cmp.mapping.preset.insert {
+				mapping = {
+					-- ['<C-Space>'] = cmp.mapping.complete(),
+					-- ['<CR>'] = cmp.mapping.confirm({ select = false }),
+					-- ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+					-- navigation
+					['<C-j>']     = { i = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }) },
+					['<C-Down>']  = { i = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }) },
+					['<C-k>']     = { i = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }) },
+					['<C-Up>']    = { i = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }) },
+					-- docs
+					['<C-_>']     = { i = toggle_docs }, -- ctrl + /  (b/c its the ? key)
+					['<C-i>']     = { i = toggle_docs },
+					-- docs navigation
+					['<C-h>']     = { i = cmp.mapping.scroll_docs(-4) },
+					['<C-Left>']  = { i = cmp.mapping.scroll_docs(-4) },
+					['<C-l>']     = { i = cmp.mapping.scroll_docs(4) },
+					['<C-Right>'] = { i = cmp.mapping.scroll_docs(4) },
+					-- accept
+					-- FIXME should maaaaaybe unbind default insert mode <C-u> mapping to avoid mistyping that
+					['<C-y>']     = { i = cmp.mapping.confirm({ select = true }) },
+				},
+			}
+			-- require'lsp-zero.cmp'.extend()
 			-- ... further configure cmp ...
 		end,
 	},
+
+	{
+		'mason-org/mason-lspconfig.nvim',
+		opts = {},
+		dependencies = {
+			{ "mason-org/mason.nvim", opts = {} },
+			'neovim/nvim-lspconfig',
+		}
+	},
+
 	{
 		'neovim/nvim-lspconfig',
 		cmd = 'LspInfo',
-		event = {'BufReadPre', 'BufNewFile'},
+		-- event = 'VeryLazy',
+		lazy = false,
 		-- TODO - make sure load order will always be as described in https://github.com/williamboman/mason-lspconfig.nvim#setup
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
-			'williamboman/mason-lspconfig.nvim',
-			'williamboman/mason.nvim',
 		},
 		config = function()
-			local lspzero = require'lsp-zero'
-			lspzero.on_attach(function(_, bufnr)
-				-- lspzero.default_keymaps{buffer = bufnr}
-				local which_key = require'which-key'
-				which_key.register({
-					K = { vim.lsp.buf.hover, 'display hover info' },
-					g = {
-						d = { function() require'telescope.builtin'.lsp_definitions() end, 'jump to definition' },
-						D = { vim.lsp.buf.declaration, 'jump to declaration' },
-						i = { function() require'telescope.builtin'.lsp_implementations() end, 'jump to implementation' },
-						o = { vim.lsp.buf.type_definition, 'jump to type definition' },
-						r = { function() require'telescope.builtin'.lsp_references() end, 'list references' },
-						s = { vim.lsp.buf.signature_help, 'show signature info' },
-						l = { vim.diagnostic.open_float, 'show diagnostics' },
-					},
-					['<leader>fs'] = { function() require'telescope.builtin'.lsp_document_symbols() end, 'symbols (document)' },
-					['<leader>fS'] = { function() require'telescope.builtin'.lsp_workspace_symbols() end, 'symbols (workspace)' },
-					['<F2>'] = { vim.lsp.buf.rename, 'rename' },
-					['<F3>'] = { function() vim.lsp.buf.format{ async = true } end, 'format' },
-					['<F4>'] = { vim.lsp.buf.code_action, 'format' },
-					['[d'] = { vim.diagnostic.goto_prev, 'previous diagnostic' },
-					[']d'] = { vim.diagnostic.goto_next, 'next diagnostic' },
-				}, { mode = 'n', buffer = bufnr })
-				which_key.register({
-					['<F3>'] = { function() vim.lsp.buf.format{ async = true } end, 'format' },
-					['<F4>'] = { vim.lsp.buf.range_code_action or vim.lsp.buf.code_action, 'code action' },
-				}, { mode = 'x', buffer = bufnr })
-			end)
-
-			local lspconfig = require'lspconfig'
+			-- local lspzero = require'lsp-zero'
+			vim.api.nvim_create_autocmd('LspAttach', {
+				callback = function(args)
+					local bufnr = args.buf
+					local which_key = require 'which-key'
+					which_key.add {
+						{
+							mode = 'n',
+							buffer = bufnr,
+							{ 'K',          vim.lsp.buf.hover,                                                  desc = 'display hover info' },
+							{ 'gd',         function() require 'telescope.builtin'.lsp_definitions() end,       desc = 'jump to definition' },
+							{ 'gD',         vim.lsp.buf.declaration,                                            desc = 'jump to declaration' },
+							{ 'gi',         function() require 'telescope.builtin'.lsp_implementations() end,   desc = 'jump to implementation' },
+							{ 'go',         vim.lsp.buf.type_definition,                                        desc = 'jump to type definition' },
+							{ 'gr',         function() require 'telescope.builtin'.lsp_references() end,        desc = 'list references' },
+							{ 'gs',         vim.lsp.buf.signature_help,                                         desc = 'show signature info' },
+							{ 'gl',         vim.diagnostic.open_float,                                          desc = 'show diagnostics' },
+							{ '<leader>fs', function() require 'telescope.builtin'.lsp_document_symbols() end,  desc = 'symbols (document)' },
+							{ '<leader>fS', function() require 'telescope.builtin'.lsp_workspace_symbols() end, desc = 'symbols (workspace)' },
+							{ '<F2>',       vim.lsp.buf.rename,                                                 desc = 'rename' },
+							{ '<F3>',       function() vim.lsp.buf.format { async = true } end,                 desc = 'format' },
+							{ '<F4>',       vim.lsp.buf.code_action,                                            desc = 'format' },
+							{ '[d',         vim.diagnostic.goto_prev,                                           desc = 'previous diagnostic' },
+							{ ']d',         vim.diagnostic.goto_next,                                           desc = 'next diagnostic' },
+						},
+						{
+							mode = 'x',
+							buffer = bufnr,
+							{ '<F3>', function() vim.lsp.buf.format { async = true } end,       desc = 'format' },
+							{ '<F4>', vim.lsp.buf.range_code_action or vim.lsp.buf.code_action, desc = 'code action' },
+						}
+					}
+				end,
+			})
 
 			-- "configure lua language server for neovim"
-			lspconfig.lua_ls.setup(lspzero.nvim_lua_ls())
+			-- vim.lsp.config('lua_ls', lspzero.nvim_lua_ls())
+			-- TODO ^ replacement for above
 
 			-- https://github.com/rust-lang/rust-analyzer/blob/master/docs/user/generated_config.adoc
-			lspconfig.rust_analyzer.setup {
+			vim.lsp.config('rust_analyzer', {
 				settings = {
 					['rust-analyzer'] = {
 						checkOnSave = {
@@ -89,29 +110,74 @@ return {
 						},
 					},
 				},
-			}
+			})
+			vim.lsp.enable('rust_analyzer')
 
-			lspconfig.pyright.setup {
-				settings = {
-					python = {
-						analysis = {
-							extraPaths = {
-								-- use stubs generated by https://github.com/strycore/fakegir for PyGObject if they're present
-								vim.fn.expand('~/.cache/fakegir'),
-							},
-						},
-					},
-				},
-			}
+			-- vim.lsp.config('pyright', {
+			-- 	settings = {
+			-- 		python = {
+			-- 			analysis = {
+			-- 				extraPaths = {
+			-- 					-- use stubs generated by https://github.com/strycore/fakegir for PyGObject if they're present
+			-- 					vim.fn.expand('~/.cache/fakegir'),
+			-- 				},
+			-- 			},
+			-- 		},
+			-- 	},
+			-- })
+			-- vim.lsp.enable('pyright')
+			-- vim.lsp.enable('basedpyright')
+			-- vim.lsp.enable('pyright')
+
+			-- (disabled for now in favor of below)
+			-- vim.lsp.enable('ty')
+			vim.lsp.enable('ruff')
+			-- auto attach ty with single-file script handling
+			-- via https://github.com/astral-sh/ty/issues/691#issuecomment-3598922969
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "python",
+				callback = function(_)
+					local first_line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] or ""
+					local has_inline_metadata = first_line:match("^# /// script")
+
+					local cmd, name, root_dir
+					if has_inline_metadata then
+						local filepath = vim.fn.expand("%:p")
+						local filename = vim.fn.fnamemodify(filepath, ":t")
+
+						-- Set a unique name for the server instance based on the filename
+						-- so we get a new client for new scripts
+						name = "ty-" .. filename
+
+						local relpath = vim.fn.fnamemodify(filepath, ":.")
+
+						cmd = { "uvx", "--with-requirements", relpath, "ty", "server" }
+						root_dir = vim.fn.fnamemodify(filepath, ":h")
+					else
+						name = "ty"
+						cmd = { "uvx", "ty", "server" }
+						root_dir = vim.fs.root(0,
+							{ 'ty.toml', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' })
+					end
+
+					vim.lsp.start({
+						name = name,
+						cmd = cmd,
+						root_dir = root_dir,
+					})
+				end,
+			})
 
 			-- via https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#jsonls
 			local capabilities_jsonls = vim.lsp.protocol.make_client_capabilities()
 			capabilities_jsonls.textDocument.completion.completionItem.snippetSupport = true
-			lspconfig.jsonls.setup {
+			vim.lsp.config('jsonls', {
 				capabilities = capabilities_jsonls,
-			}
+			})
 
-			lspzero.setup()
+			vim.lsp.enable('gopls')
+
+			vim.lsp.enable('csharp-language-server')
 		end,
 	},
 
@@ -124,4 +190,3 @@ return {
 		},
 	},
 }
-

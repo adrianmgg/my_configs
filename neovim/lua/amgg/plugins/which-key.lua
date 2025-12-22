@@ -14,47 +14,35 @@ local function telescope_extension(extension, picker, opts)
 	end
 end
 
-local whichkey_keymaps = {
-	{
-		opts = { prefix = '<leader>' },
-		mappings = {
-			f = {
-				name = 'find',
-				t = { '<cmd>Telescope<cr>', 'telescope commands' },
-				f = { telescope_builtin'find_files', 'local files' },
-				b = { telescope_builtin'buffers', 'buffers' },
-				c = { telescope_builtin'colorscheme', 'color schemes' },
-				F = { telescope_builtin'live_grep', 'grep in files' },
-				g = { telescope_builtin'git_files', 'git files' },
-				h = { telescope_builtin('find_files', { hidden = true }), 'local files (include hidden)' },
-				-- via https://github.com/nvim-telescope/telescope.nvim/issues/855#issuecomment-1032325327
-				H = { telescope_builtin('live_grep', { additional_args = function(opts) return {'--hidden'} end }), 'grep in files (include hidden)' },
-				N = { telescope_extension'nvim_configs', 'nvim config files' },
-				-- TODO should only actually register these if we end up loading telescope-everything
-				E = { telescope_extension('everything', 'everything', {}), 'everything' },
-			},
-		},
-	},
-	{
-		opts = { prefix = 'g' },
-		mappings = {
-			p = { '`[v`]', 'switch to VISUAL using last pasted text' },
-			P = { '`[V`]', 'switch to VISUAL LINE using last pasted text' },
-		},
-	},
-}
-
 return {
 	{
 		'folke/which-key.nvim',
 		event = 'VeryLazy', -- via https://github.com/folke/which-key.nvim#lazynvim
-		config = function()
-			local which_key = require'which-key'
-			which_key.setup({})
-			for _, register_args in ipairs(whichkey_keymaps) do
-				which_key.register(register_args.mappings, register_args.opts)
-			end
-		end,
+		dependencies = { 'nvim-mini/mini.icons', 'nvim-tree/nvim-web-devicons' },
+		opts = {},
+		keys = {
+			-- NOTE: see :help mode() for mode shortcodes list
+
+			{ '<leader>?', function() require('which-key').show({ global = false }) end, desc = 'Buffer Local Keymaps (which-key)' },
+			-- { '?', function() require('which-key').show({ global = false }) end, desc = 'Buffer Local Keymaps (which-key)', cond = function() return vim.fn.mode() == 'niI' end },  -- 'niI', 'niR', 'niV', 'ntT'
+
+			{ '<leader>f', group = 'find' },
+			{ '<leader>ft', '<cmd>Telescope<cr>', desc = 'telescope commands' },
+			{ '<leader>ff', telescope_builtin'find_files', desc = 'local files' },
+			{ '<leader>fb', telescope_builtin'buffers', desc = 'buffers' },
+			{ '<leader>fc', telescope_builtin'colorscheme', desc = 'color schemes' },
+			{ '<leader>fF', telescope_builtin'live_grep', desc = 'grep in files' },
+			{ '<leader>fg', telescope_builtin'git_files', desc = 'git files' },
+			{ '<leader>fh', telescope_builtin('find_files', { hidden = true }), desc = 'local files (include hidden)' },
+			-- via https://github.com/nvim-telescope/telescope.nvim/issues/855#issuecomment-1032325327
+			{ '<leader>fH', telescope_builtin('live_grep', { additional_args = function(opts) return {'--hidden'} end }), desc = 'grep in files (include hidden)' },
+			{ '<leader>fN', telescope_extension'nvim_configs', desc = 'nvim config files' },
+			-- TODO should only actually register these if we end up loading telescope-everything
+			{ '<leader>fE', telescope_extension('everything', 'everything', {}), desc = 'everything' },
+
+			{ 'gp', '`[v`]', desc = 'switch to VISUAL using last pasted text' },
+			{ 'gP', '`[V`]', desc = 'switch to VISUAL LINE using last pasted text' },
+		},
 	}
 }
 

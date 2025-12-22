@@ -1,6 +1,7 @@
 return {
 	{
 		'nvim-telescope/telescope.nvim',
+		-- FIXME unpin from this old-ass version
 		tag = '0.1.2',
 		dependencies = { 'nvim-lua/plenary.nvim' },
 		cmd = 'Telescope',
